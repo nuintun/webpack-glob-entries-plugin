@@ -1,0 +1,27 @@
+{
+  "name": "webpack-glob-entries-plugin",
+  "version": "0.0.0",
+  "description": "Provides a way to glob for entry files in Webpack watch and non-watch modes.",
+  "main": "index.js",
+  "engines": {
+    "node": ">=6.11.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nuintun/webpack-glob-entries-plugin.git"
+  },
+  "keywords": ["webpack", "glob", "entry", "entries", "watch"],
+  "author": {
+    "name": "nuintun",
+    "email": "nuintun@qq.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nuintun/webpack-glob-entries-plugin/issues"
+  },
+  "homepage": "https://github.com/nuintun/webpack-glob-entries-plugin#readme",
+  "dependencies": {
+    "glob": "^7.1.2",
+    "glob-parent": "^3.1.0"
+  }
+}
