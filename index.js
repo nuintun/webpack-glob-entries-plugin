@@ -13,6 +13,16 @@ const globParent = require('glob-parent');
 const directories = new Set();
 
 /**
+ * @function unixify
+ * @description Convert path separators to posix/unix-style forward slashes.
+ * @param {string} path
+ * @returns {string}
+ */
+function unixify(path) {
+  return path.replace(/\\/g, '/');
+}
+
+/**
  * @function getFiles
  * @description Create webpack file entry object
  * @param {string} pattern
@@ -21,29 +31,32 @@ const directories = new Set();
  */
 function getFiles(pattern, options) {
   const parent = globParent(pattern);
-  const getEntryName = options.getEntryName;
+  const resolveEntryName = options.resolveEntryName;
 
   return glob.sync(pattern, options.glob).reduce((files, file) => {
-    const extname = path.extname(file);
-    const extnameLength = extname.length;
-
     // Format the entryName
-    let entryName = path.relative(parent, file);
+    let entryName;
 
-    if (extnameLength) {
-      entryName = entryName.slice(0, -extnameLength);
-    }
+    // Resolve entry name
+    if (resolveEntryName) {
+      const name = resolveEntryName(parent, file);
 
-    entryName = entryName.replace(/\\/g, '/');
-
-    if (getEntryName) {
-      const name = getEntryName(entryName);
-
-      if (typeof name !== 'string') {
-        throw new TypeError('The options.getEntryName must be return a string');
+      if (!name || typeof name !== 'string') {
+        throw new TypeError('The options.resolveEntryName must be return a non empty string');
       }
 
-      entryName = name;
+      entryName = unixify(name);
+    } else {
+      const extname = path.extname(file);
+      const extnameLength = extname.length;
+
+      entryName = path.relative(parent, file);
+
+      if (extnameLength) {
+        entryName = entryName.slice(0, -extnameLength);
+      }
+
+      entryName = unixify(entryName);
     }
 
     // Add the entry to the files obj
@@ -58,12 +71,11 @@ function getFiles(pattern, options) {
  */
 class WatchableGlobEntries {
   /**
-   *
-   * @param globs
-   * @param options
-   * @returns {Function}
+   * @constructor
+   * @param {string|string[]} globs
+   * @param {Object} options
    */
-  static entries(globs, options) {
+  constructor(globs, options) {
     // Check if globs are provided properly
     if (typeof globs !== 'string' && !Array.isArray(globs)) {
       throw new TypeError('The param globs must be a string or an array of strings');
@@ -76,11 +88,25 @@ class WatchableGlobEntries {
 
     options = Object.assign({}, options);
 
-    if (typeof options.getEntryName !== 'function') {
-      delete options.getEntryName;
+    if (typeof options.resolveEntryName !== 'function') {
+      delete options.resolveEntryName;
     }
 
-    return function() {
+    this.globs = globs;
+    this.options = options;
+    this.directories = new Set();
+  }
+
+  /**
+   * @method entries
+   * @returns {Function}
+   */
+  entries() {
+    const globs = this.globs;
+    const options = this.options;
+    const directories = this.directories;
+
+    return () => {
       // Map through the globs
       return globs.reduce((files, glob) => {
         const parent = globParent(glob);
@@ -102,12 +128,15 @@ class WatchableGlobEntries {
    * @param {Object} compiler
    */
   apply(compiler) {
+    // Binding context
+    const afterCompile = this.afterCompile.bind(this);
+
+    // Support Webpack >= 4
     if (compiler.hooks) {
-      // Support Webpack >= 4
-      compiler.hooks.afterCompile.tapAsync(this.constructor.name, this.afterCompile.bind(this));
+      compiler.hooks.afterCompile.tapAsync(this.constructor.name, afterCompile);
     } else {
       // Support Webpack < 4
-      compiler.plugin('after-compile', this.afterCompile);
+      compiler.plugin('after-compile', afterCompile);
     }
   }
 
@@ -115,16 +144,19 @@ class WatchableGlobEntries {
    * @method afterCompile
    * @description After compiling, give webpack the globbed files
    * @param {Object} compilation
-   * @param {Function} callback
+   * @param {Function} next
    */
   afterCompile(compilation, next) {
-    if (Array.isArray(compilation.contextDependencies)) {
+    const directories = this.directories;
+    const contextDependencies = compilation.contextDependencies;
+
+    if (Array.isArray(contextDependencies)) {
       // Support Webpack < 4
-      compilation.contextDependencies = compilation.contextDependencies.concat(directories);
+      compilation.contextDependencies = contextDependencies.concat(Array.from(directories));
     } else {
       // Support Webpack >= 4
       for (const directory of directories) {
-        compilation.contextDependencies.add(directory);
+        contextDependencies.add(directory);
       }
     }
 
@@ -132,4 +164,5 @@ class WatchableGlobEntries {
   }
 }
 
+// Exports
 module.exports = WatchableGlobEntries;

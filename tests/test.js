@@ -1,3 +1,5 @@
 const WatchableGlobEntries = require('../index');
 
-console.log(WatchableGlobEntries.entries('node_modules/**/*.js', null)());
+const globEntries = new WatchableGlobEntries('node_modules/**/*.js');
+
+console.log(globEntries.entries()());
