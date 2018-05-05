@@ -26,41 +26,49 @@ function unixify(path) {
  * @param {string} pattern
  * @param {string} parent
  * @param {Object} options
- * @returns {Object}
+ * @returns {Promise}
  */
 function getFiles(pattern, parent, options) {
   const resolveEntryName = options.resolveEntryName;
 
-  return glob.sync(pattern, options.glob).reduce((files, file) => {
-    let entryName;
+  return new Promise((resolve, reject) => {
+    glob(pattern, options.glob, (error, files) => {
+      if (error) return reject(error);
 
-    // Resolve entry name
-    if (resolveEntryName) {
-      const name = resolveEntryName(parent, file);
+      const entries = files.reduce((entries, file) => {
+        let entryName;
 
-      if (!name || typeof name !== 'string') {
-        throw new TypeError('The options.resolveEntryName must be return a non empty string');
-      }
+        // Resolve entry name
+        if (resolveEntryName) {
+          const name = resolveEntryName(parent, file);
 
-      entryName = unixify(name);
-    } else {
-      const extname = path.extname(file);
-      const extnameLength = extname.length;
+          if (!name || typeof name !== 'string') {
+            throw new TypeError('The options.resolveEntryName must be return a non empty string');
+          }
 
-      entryName = path.relative(parent, file);
+          entryName = unixify(name);
+        } else {
+          const extname = path.extname(file);
+          const extnameLength = extname.length;
 
-      if (extnameLength) {
-        entryName = entryName.slice(0, -extnameLength);
-      }
+          entryName = path.relative(parent, file);
 
-      entryName = unixify(entryName);
-    }
+          if (extnameLength) {
+            entryName = entryName.slice(0, -extnameLength);
+          }
 
-    // Add the entry to the files obj
-    files[entryName] = path.resolve(file);
+          entryName = unixify(entryName);
+        }
 
-    return files;
-  }, {});
+        // Add the entry to the entries
+        entries[entryName] = path.resolve(file);
+
+        return entries;
+      }, {});
+
+      resolve(entries);
+    });
+  });
 }
 
 /**
@@ -104,8 +112,7 @@ class WatchableGlobEntries {
     const directories = this.directories;
 
     return () => {
-      // Map through the globs
-      return globs.reduce((files, glob) => {
+      const entries = globs.reduce((entries, glob) => {
         const parent = path.resolve(globParent(glob));
 
         // Dont add if its already in the directories
@@ -113,9 +120,14 @@ class WatchableGlobEntries {
           directories.add(parent);
         }
 
-        // Set the globbed files
-        return Object.assign(files, getFiles(glob, parent, options));
-      }, {});
+        entries.push(getFiles(glob, parent, options));
+
+        return entries;
+      }, []);
+
+      return Promise.all(entries).then(entries =>
+        entries.reduce((entries, entry) => Object.assign(entries, entry), {})
+      );
     };
   }
 
