@@ -10,8 +10,6 @@ const path = require('path');
 const glob = require('glob');
 const globParent = require('glob-parent');
 
-const directories = new Set();
-
 /**
  * @function unixify
  * @description Convert path separators to posix/unix-style forward slashes.
