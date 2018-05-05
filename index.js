@@ -57,7 +57,7 @@ function getFiles(pattern, options) {
     }
 
     // Add the entry to the files obj
-    files[entryName] = file;
+    files[entryName] = path.resolve(file);
 
     return files;
   }, {});
@@ -145,16 +145,21 @@ class WatchableGlobEntries {
    */
   afterCompile(compilation, next) {
     const directories = this.directories;
-    const contextDependencies = compilation.contextDependencies;
 
-    if (Array.isArray(contextDependencies)) {
-      // Support Webpack < 4
-      compilation.contextDependencies = contextDependencies.concat(Array.from(directories));
-    } else {
-      // Support Webpack >= 4
-      for (const directory of directories) {
-        contextDependencies.add(directory);
+    if (directories.size) {
+      const contextDependencies = compilation.contextDependencies;
+
+      if (Array.isArray(contextDependencies)) {
+        // Support Webpack < 4
+        compilation.contextDependencies = contextDependencies.concat(Array.from(directories));
+      } else {
+        // Support Webpack >= 4
+        for (const directory of directories) {
+          contextDependencies.add(directory);
+        }
       }
+
+      directories.clear();
     }
 
     next();
