@@ -24,11 +24,11 @@ function unixify(path) {
  * @function getFiles
  * @description Create webpack file entry object
  * @param {string} pattern
+ * @param {string} parent
  * @param {Object} options
  * @returns {Object}
  */
-function getFiles(pattern, options) {
-  const parent = globParent(pattern);
+function getFiles(pattern, parent, options) {
   const resolveEntryName = options.resolveEntryName;
 
   return glob.sync(pattern, options.glob).reduce((files, file) => {
@@ -106,7 +106,7 @@ class WatchableGlobEntries {
     return () => {
       // Map through the globs
       return globs.reduce((files, glob) => {
-        const parent = globParent(glob);
+        const parent = path.resolve(globParent(glob));
 
         // Dont add if its already in the directories
         if (!directories.has(parent)) {
@@ -114,7 +114,7 @@ class WatchableGlobEntries {
         }
 
         // Set the globbed files
-        return Object.assign(files, getFiles(glob, options));
+        return Object.assign(files, getFiles(glob, parent, options));
       }, {});
     };
   }
