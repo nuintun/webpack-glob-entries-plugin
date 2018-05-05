@@ -32,7 +32,7 @@ function getFiles(pattern, parent, options) {
   const resolveEntryName = options.resolveEntryName;
 
   return new Promise((resolve, reject) => {
-    glob(pattern, options.glob, (error, files) => {
+    return glob(pattern, options.glob, (error, files) => {
       if (error) return reject(error);
 
       const entries = files.reduce((entries, file) => {
