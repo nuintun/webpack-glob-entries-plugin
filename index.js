@@ -32,7 +32,6 @@ function getFiles(pattern, options) {
   const resolveEntryName = options.resolveEntryName;
 
   return glob.sync(pattern, options.glob).reduce((files, file) => {
-    // Format the entryName
     let entryName;
 
     // Resolve entry name
