@@ -13,6 +13,9 @@ const path = require('path');
 const glob = require('glob');
 const globParent = require('glob-parent');
 
+// Plugin name
+const PLUGIN_NAME = 'webpack-glob-entries-plugin';
+
 /**
  * @function unixify
  * @description Convert path separators to posix/unix-style forward slashes.
@@ -155,7 +158,7 @@ class WatchableGlobEntries {
 
     // Support Webpack >= 4
     if (compiler.hooks) {
-      compiler.hooks.afterCompile.tapAsync(this.constructor.name, afterCompile);
+      compiler.hooks.afterCompile.tapAsync(PLUGIN_NAME, afterCompile);
     } else {
       // Support Webpack < 4
       compiler.plugin('after-compile', afterCompile);
