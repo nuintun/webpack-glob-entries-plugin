@@ -14,10 +14,10 @@ new WebpackGlobEntriesPlugin(globs: string|string[], options?: { glob: Object, r
 ```
 
 >
-> * globs: The glob string or glob string array
-> * options: The configure options
->   * options.glob: The [node-glob](https://github.com/isaacs/node-glob) configure options
->   * options.resolveEntryName: The entry name resolve function
+> * globs: The glob string or glob string array.
+> * options: The configure options.
+>   * options.glob: The [node-glob](https://github.com/isaacs/node-glob) configure options.
+>   * options.resolveEntryName: The entry name resolve function.
 
 ### Usage
 
