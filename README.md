@@ -14,7 +14,7 @@ new WebpackGlobEntriesPlugin(globs: string|string[], options?: { glob: Object, r
 ```
 
 >
-> * globs: The glob string or glob string array.
+> * globs: The glob string or array of glob strings.
 > * options: The configure options.
 >   * options.glob: The [node-glob](https://github.com/isaacs/node-glob) configure options.
 >   * options.resolveEntryName: The entry name resolve function.
@@ -24,18 +24,18 @@ new WebpackGlobEntriesPlugin(globs: string|string[], options?: { glob: Object, r
 ```js
 const WatchableGlobEntries = require('webpack-glob-entries-plugin');
 
-const globEntries = new WatchableGlobEntries('src/js/pages/**/*.js');
+const watcher = new WatchableGlobEntries('src/js/pages/**/*.js');
 
 module.exports = {
   mode: 'development',
-  entry: globEntries.entries(),
+  entry: watcher.entries(),
   output: {
     publicPath: '/dist/',
     path: path.resolve('dist'),
     filename: 'js/pages/[name].js',
     chunkFilename: 'js/chunks/[chunkhash].js'
   },
-  plugins: [globEntries]
+  plugins: [watcher]
 };
 ```
 

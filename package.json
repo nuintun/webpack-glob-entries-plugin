@@ -1,6 +1,6 @@
 {
   "name": "webpack-glob-entries-plugin",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Provides a way to glob for entry files in Webpack watch and non-watch modes.",
   "main": "index.js",
   "engines": {

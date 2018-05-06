@@ -87,7 +87,7 @@ class WatchableGlobEntries {
   constructor(globs, options) {
     // Check if globs are provided properly
     if (typeof globs !== 'string' && !Array.isArray(globs)) {
-      throw new TypeError('The param globs must be a string or an array of strings');
+      throw new TypeError('The param globs must be a glob string or an array of glob strings');
     }
 
     // Make entries an array
