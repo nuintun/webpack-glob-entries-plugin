@@ -2,9 +2,12 @@
  * @module index
  * @license MIT
  * @author nuintun
+ * @version 2018/05/06
  * @description Provides a way to glob for entry files in Webpack watch and non-watch modes.
  * @see https://github.com/Milanzor/webpack-watched-glob-entries-plugin
  */
+
+'use strict';
 
 const path = require('path');
 const glob = require('glob');

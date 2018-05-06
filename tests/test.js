@@ -1,7 +1,15 @@
+/**
+ * @module test
+ * @license MIT
+ * @author nuintun
+ * @version 2018/05/06
+ */
+'use strict';
+
 const WatchableGlobEntries = require('../index');
 
-const globEntries = new WatchableGlobEntries('node_modules/**/*.js');
+const watcher = new WatchableGlobEntries('node_modules/**/*.js');
 
-globEntries
+watcher
   .entries()()
   .then(entries => console.log(entries));
