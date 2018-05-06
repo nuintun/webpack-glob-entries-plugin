@@ -88,7 +88,7 @@ class WatchableGlobEntries {
   /**
    * @constructor
    * @param {string|string[]} globs
-   * @param {Object} options
+   * @param {Object} [options]
    */
   constructor(globs, options) {
     // Check if globs are provided properly
