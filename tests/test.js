@@ -6,9 +6,9 @@
  */
 'use strict';
 
-const WatchableGlobEntries = require('../index');
+const WebpackGlobEntriesPlugin = require('../index');
 
-const watcher = new WatchableGlobEntries('node_modules/**/*.js');
+const watcher = new WebpackGlobEntriesPlugin('node_modules/**/*.js');
 
 watcher
   .entries()()
