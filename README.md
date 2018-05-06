@@ -22,9 +22,9 @@ new WebpackGlobEntriesPlugin(globs: string|string[], options?: { glob: Object, r
 ### Usage
 
 ```js
-const WatchableGlobEntries = require('webpack-glob-entries-plugin');
+const WebpackGlobEntriesPlugin = require('webpack-glob-entries-plugin');
 
-const watcher = new WatchableGlobEntries('src/js/pages/**/*.js');
+const watcher = new WebpackGlobEntriesPlugin('src/js/pages/**/*.js');
 
 module.exports = {
   mode: 'development',
