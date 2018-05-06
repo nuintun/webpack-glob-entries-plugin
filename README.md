@@ -9,7 +9,10 @@
 
 ### API
 
-> new WebpackGlobEntriesPlugin(globs: string|string[], options?: { glob: Object, resolveEntryName: Function });
+```typescript
+new WebpackGlobEntriesPlugin(globs: string|string[], options?: { glob: Object, resolveEntryName: Function });
+```
+
 >
 > * globs: The glob string or glob string array
 > * options: The configure options
