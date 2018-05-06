@@ -22,7 +22,7 @@ function unixify(path) {
 
 /**
  * @function getFiles
- * @description Create webpack file entry object
+ * @description Create webpack file entry object.
  * @param {string} pattern
  * @param {string} parent
  * @param {Object} options
@@ -31,10 +31,13 @@ function unixify(path) {
 function getFiles(pattern, parent, options) {
   const resolveEntryName = options.resolveEntryName;
 
+  // Return a promise
   return new Promise((resolve, reject) => {
     return glob(pattern, options.glob, (error, files) => {
+      // Found error
       if (error) return reject(error);
 
+      // Get entries
       const entries = files.reduce((entries, file) => {
         let entryName;
 
@@ -66,6 +69,7 @@ function getFiles(pattern, parent, options) {
         return entries;
       }, {});
 
+      // Resolve entries
       resolve(entries);
     });
   });
@@ -91,8 +95,10 @@ class WatchableGlobEntries {
       globs = [globs];
     }
 
+    // Assign options
     options = Object.assign({}, options);
 
+    // Assert resolveEntryName
     if (typeof options.resolveEntryName !== 'function') {
       delete options.resolveEntryName;
     }
@@ -111,7 +117,9 @@ class WatchableGlobEntries {
     const options = this.options;
     const directories = this.directories;
 
+    // Dynamic entries
     return () => {
+      // Get entries
       const entries = globs.reduce((entries, glob) => {
         const parent = path.resolve(globParent(glob));
 
@@ -120,11 +128,13 @@ class WatchableGlobEntries {
           directories.add(parent);
         }
 
+        // Collect entry files
         entries.push(getFiles(glob, parent, options));
 
         return entries;
       }, []);
 
+      // Parallel get entries
       return Promise.all(entries).then(entries =>
         entries.reduce((entries, entry) => Object.assign(entries, entry), {})
       );
@@ -133,7 +143,7 @@ class WatchableGlobEntries {
 
   /**
    * @method apply
-   * @description Install Plugin
+   * @description Install Plugin.
    * @param {Object} compiler
    */
   apply(compiler) {
@@ -151,13 +161,14 @@ class WatchableGlobEntries {
 
   /**
    * @method afterCompile
-   * @description After compiling, give webpack the globbed files
+   * @description After compiling, give webpack the globbed files.
    * @param {Object} compilation
    * @param {Function} next
    */
   afterCompile(compilation, next) {
     const directories = this.directories;
 
+    // Only run directories not empty
     if (directories.size) {
       const contextDependencies = compilation.contextDependencies;
 
@@ -171,6 +182,7 @@ class WatchableGlobEntries {
         }
       }
 
+      // Clear directories
       directories.clear();
     }
 
