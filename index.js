@@ -35,6 +35,7 @@ function unixify(path) {
  * @returns {Promise}
  */
 function getFiles(pattern, parent, options) {
+  const filter = options.filter;
   const resolveEntryName = options.resolveEntryName;
 
   // Return a promise
@@ -44,7 +45,11 @@ function getFiles(pattern, parent, options) {
       if (error) return reject(error);
 
       // Get entries
-      const entries = files.reduce((entries, file) => {
+      const entries = files.reduce((entries, file, index) => {
+        // Filter files
+        if (filter && !filter(file, index)) return entries;
+
+        // Entry name
         let entryName;
 
         // Resolve entry name
@@ -104,6 +109,14 @@ class WatchableGlobEntries {
     // Assign options
     options = Object.assign({}, options);
 
+    // Make seed an object
+    options.seed = options.seed || {};
+
+    // Assert filter
+    if (typeof options.filter !== 'function') {
+      delete options.filter;
+    }
+
     // Assert resolveEntryName
     if (typeof options.resolveEntryName !== 'function') {
       delete options.resolveEntryName;
@@ -142,7 +155,7 @@ class WatchableGlobEntries {
 
       // Parallel get entries
       return Promise.all(entries).then(entries =>
-        entries.reduce((entries, entry) => Object.assign(entries, entry), {})
+        entries.reduce((entries, entry) => Object.assign(entries, entry), options.seed)
       );
     };
   }
