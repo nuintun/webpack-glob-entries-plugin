@@ -36,7 +36,8 @@ function unixify(path) {
  */
 function getFiles(pattern, parent, options) {
   const filter = options.filter;
-  const resolveEntryName = options.resolveEntryName;
+  const mapEntry = options.mapEntry;
+  const mapEntryName = options.mapEntryName;
 
   // Return a promise
   return new Promise((resolve, reject) => {
@@ -46,18 +47,21 @@ function getFiles(pattern, parent, options) {
 
       // Get entries
       const entries = files.reduce((entries, file, index) => {
+        // Resolve file
+        file = path.resolve(file);
+
         // Filter files
         if (filter && !filter(file, index)) return entries;
 
         // Entry name
         let entryName;
 
-        // Resolve entry name
-        if (resolveEntryName) {
-          const name = resolveEntryName(parent, file);
+        // Map entry name
+        if (mapEntryName) {
+          const name = mapEntryName(file, parent);
 
           if (!name || typeof name !== 'string') {
-            throw new TypeError('The options.resolveEntryName must be return a non empty string');
+            throw new TypeError('The options.mapEntryName must be return a non empty string');
           }
 
           entryName = unixify(name);
@@ -74,8 +78,24 @@ function getFiles(pattern, parent, options) {
           entryName = unixify(entryName);
         }
 
+        // Map entry
+        if (mapEntry) {
+          const entry = mapEntry(file, parent);
+
+          if (
+            !entry ||
+            (typeof entry !== 'string' &&
+              Array.isArray(entry) &&
+              !entry.every(entry => entry && typeof entry === 'string'))
+          ) {
+            throw new TypeError('The options.mapEntry must be return a non empty string or string[]');
+          }
+
+          file = entry;
+        }
+
         // Add the entry to the entries
-        entries[entryName] = path.resolve(file);
+        entries[entryName] = file;
 
         return entries;
       }, {});
@@ -117,9 +137,14 @@ class WatchableGlobEntries {
       delete options.filter;
     }
 
-    // Assert resolveEntryName
-    if (typeof options.resolveEntryName !== 'function') {
-      delete options.resolveEntryName;
+    // Assert mapEntryName
+    if (typeof options.mapEntryName !== 'function') {
+      delete options.mapEntryName;
+    }
+
+    // Assert mapEntry
+    if (typeof options.mapEntry !== 'function') {
+      delete options.mapEntry;
     }
 
     this.globs = globs;
