@@ -10,7 +10,13 @@
     "type": "git",
     "url": "git+https://github.com/nuintun/webpack-glob-entries-plugin.git"
   },
-  "keywords": ["webpack", "glob", "entry", "entries", "watch"],
+  "keywords": [
+    "webpack",
+    "glob",
+    "entry",
+    "entries",
+    "watch"
+  ],
   "author": {
     "name": "nuintun",
     "email": "nuintun@qq.com"
