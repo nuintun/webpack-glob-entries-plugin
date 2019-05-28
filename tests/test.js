@@ -3,6 +3,7 @@
  * @license MIT
  * @author nuintun
  */
+
 'use strict';
 
 const WebpackGlobEntriesPlugin = require('../index');
