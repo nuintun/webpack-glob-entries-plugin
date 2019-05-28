@@ -2,7 +2,6 @@
  * @module index
  * @license MIT
  * @author nuintun
- * @version 2018/05/06
  * @description Provides a way to glob for entry files in Webpack watch and non-watch modes.
  * @see https://github.com/Milanzor/webpack-watched-glob-entries-plugin
  */
@@ -84,9 +83,7 @@ function getFiles(pattern, parent, options) {
 
           if (
             !entry ||
-            (typeof entry !== 'string' &&
-              Array.isArray(entry) &&
-              !entry.every(entry => entry && typeof entry === 'string'))
+            (typeof entry !== 'string' && Array.isArray(entry) && !entry.every(entry => entry && typeof entry === 'string'))
           ) {
             throw new TypeError('The options.mapEntry must be return a non empty string or string[]');
           }
