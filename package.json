@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "glob": "^7.1.6",
-    "glob-parent": "^5.1.0"
+    "glob-parent": "^6.0.0"
   },
   "scripts": {
     "test": "node tests/test.js"
